@@ -29,19 +29,13 @@ class PolyBLEP {
 public:
     enum Waveform {
         SINE,
-        COSINE,
         TRIANGLE,
         SQUARE,
         RECTANGLE,
-        SAWTOOTH,
-        RAMP,
-        MODIFIED_TRIANGLE,
-        MODIFIED_SQUARE,
-        HALF_WAVE_RECTIFIED_SINE,
-        FULL_WAVE_RECTIFIED_SINE,
+        HALF_SINE,
         TRIANGULAR_PULSE,
-        TRAPEZOID_FIXED,
-        TRAPEZOID_VARIABLE
+        TRAPEZOID,
+	WAVEFORMS_LEN
     };
 
     PolyBLEP(double sampleRate, Waveform waveform = SINE, double initialFrequency = 440.0);
@@ -77,32 +71,12 @@ protected:
     void setdt(double time);
 
     double sin() const;
-
-    double cos() const;
-
     double half() const;
-
-    double full() const;
-
     double tri() const;
-
-    double tri2() const;
-
     double trip() const;
-
     double trap() const;
-
-    double trap2() const;
-
     double sqr() const;
-
-    double sqr2() const;
-
     double rect() const;
-
-    double saw() const;
-
-    double ramp() const;
 };
 
 

@@ -121,32 +121,18 @@ double PolyBLEP::get() const {
     } else switch (waveform) {
         case SINE:
             return sin();
-        case COSINE:
-            return cos();
         case TRIANGLE:
             return tri();
         case SQUARE:
             return sqr();
         case RECTANGLE:
             return rect();
-        case SAWTOOTH:
-            return saw();
-        case RAMP:
-            return ramp();
-        case MODIFIED_TRIANGLE:
-            return tri2();
-        case MODIFIED_SQUARE:
-            return sqr2();
-        case HALF_WAVE_RECTIFIED_SINE:
+        case HALF_SINE:
             return half();
-        case FULL_WAVE_RECTIFIED_SINE:
-            return full();
         case TRIANGULAR_PULSE:
             return trip();
-        case TRAPEZOID_FIXED:
+        case TRAPEZOID:
             return trap();
-        case TRAPEZOID_VARIABLE:
-            return trap2();
         default:
             return 0.0;
     }
@@ -164,12 +150,9 @@ double PolyBLEP::getAndInc() {
 }
 
 double PolyBLEP::sin() const {
-    return amplitude * std::sin(TWO_PI * t);
+    return amplitude * std::sin(TWO_PI * (t - 0.25));
 }
 
-double PolyBLEP::cos() const {
-    return amplitude * std::cos(TWO_PI * t);
-}
 
 double PolyBLEP::half() const {
     double t2 = t + 0.5;
@@ -181,37 +164,7 @@ double PolyBLEP::half() const {
     return amplitude * y;
 }
 
-double PolyBLEP::full() const {
-    double _t = this->t + 0.25;
-    _t -= bitwiseOrZero(_t);
-
-    double y = 2 * std::sin(M_PI * _t) - 4 / M_PI;
-    y += TWO_PI * freqInSecondsPerSample * blamp(_t, freqInSecondsPerSample);
-
-    return amplitude * y;
-}
-
 double PolyBLEP::tri() const {
-    double t1 = t + 0.25;
-    t1 -= bitwiseOrZero(t1);
-
-    double t2 = t + 0.75;
-    t2 -= bitwiseOrZero(t2);
-
-    double y = t * 4;
-
-    if (y >= 3) {
-        y -= 4;
-    } else if (y > 1) {
-        y = 2 - y;
-    }
-
-    y += 4 * freqInSecondsPerSample * (blamp(t1, freqInSecondsPerSample) - blamp(t2, freqInSecondsPerSample));
-
-    return amplitude * y;
-}
-
-double PolyBLEP::tri2() const {
     double pulseWidth = std::fmax(0.0001, std::fmin(0.9999, this->pulseWidth));
 
     double t1 = t + 0.5 * pulseWidth;
@@ -259,36 +212,6 @@ double PolyBLEP::trip() const {
 }
 
 double PolyBLEP::trap() const {
-    double y = 4 * t;
-    if (y >= 3) {
-        y -= 4;
-    } else if (y > 1) {
-        y = 2 - y;
-    }
-    y = std::fmax(-1, std::fmin(1, 2 * y));
-
-    double t1 = t + 0.125;
-    t1 -= bitwiseOrZero(t1);
-
-    double t2 = t1 + 0.5;
-    t2 -= bitwiseOrZero(t2);
-
-    // Triangle #1
-    y += 4 * freqInSecondsPerSample * (blamp(t1, freqInSecondsPerSample) - blamp(t2, freqInSecondsPerSample));
-
-    t1 = t + 0.375;
-    t1 -= bitwiseOrZero(t1);
-
-    t2 = t1 + 0.5;
-    t2 -= bitwiseOrZero(t2);
-
-    // Triangle #2
-    y += 4 * freqInSecondsPerSample * (blamp(t1, freqInSecondsPerSample) - blamp(t2, freqInSecondsPerSample));
-
-    return amplitude * y;
-}
-
-double PolyBLEP::trap2() const {
     double pulseWidth = std::fmin(0.9999, this->pulseWidth);
     double scale = 1 / (1 - pulseWidth);
 
@@ -321,17 +244,8 @@ double PolyBLEP::trap2() const {
     return amplitude * y;
 }
 
+
 double PolyBLEP::sqr() const {
-    double t2 = t + 0.5;
-    t2 -= bitwiseOrZero(t2);
-
-    double y = t < 0.5 ? 1 : -1;
-    y += blep(t, freqInSecondsPerSample) - blep(t2, freqInSecondsPerSample);
-
-    return amplitude * y;
-}
-
-double PolyBLEP::sqr2() const {
     double t1 = t + 0.875 + 0.25 * (pulseWidth - 0.5);
     t1 -= bitwiseOrZero(t1);
 
@@ -367,26 +281,6 @@ double PolyBLEP::rect() const {
     }
 
     y += blep(t, freqInSecondsPerSample) - blep(t2, freqInSecondsPerSample);
-
-    return amplitude * y;
-}
-
-double PolyBLEP::saw() const {
-    double _t = t + 0.5;
-    _t -= bitwiseOrZero(_t);
-
-    double y = 2 * _t - 1;
-    y -= blep(_t, freqInSecondsPerSample);
-
-    return amplitude * y;
-}
-
-double PolyBLEP::ramp() const {
-    double _t = t;
-    _t -= bitwiseOrZero(_t);
-
-    double y = 1 - 2 * _t;
-    y += blep(_t, freqInSecondsPerSample);
 
     return amplitude * y;
 }
