@@ -150,7 +150,12 @@ double PolyBLEP::getAndInc() {
 }
 
 double PolyBLEP::sin() const {
-    return amplitude * std::sin(TWO_PI * (t - 0.25));
+    if (t < pulseWidth) {
+        return amplitude * std::sin(TWO_PI * (0.5 * t / pulseWidth - 0.25));
+    }
+    else {
+        return amplitude * std::sin(TWO_PI * (0.5 * (t - pulseWidth) / (1 - pulseWidth) + 0.25));
+    }
 }
 
 
@@ -161,7 +166,7 @@ double PolyBLEP::half() const {
     double y = (t < 0.5 ? 2 * std::sin(TWO_PI * t) - 2 / M_PI : -2 / M_PI);
     y += TWO_PI * freqInSecondsPerSample * (blamp(t, freqInSecondsPerSample) + blamp(t2, freqInSecondsPerSample));
 
-    return amplitude * y;
+    return amplitude * y * 2.0;
 }
 
 double PolyBLEP::tri() const {
