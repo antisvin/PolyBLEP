@@ -280,15 +280,23 @@ double PolyBLEP::sqr() const {
 }
 
 double PolyBLEP::rect() const {
-    double t2 = t + 1 - pulseWidth;
+    double t0;
+    if (pulseWidth > 0.5) {
+        t0 = fmod(t + 0.5 + pulseWidth / 2.0, 1.0);
+    }
+    else {
+       t0 = fmod(t + 1 - pulseWidth / 2.0, 1.0);
+    };
+    //t0 = t;
+    double t2 = t0 + 1 - pulseWidth;
     t2 -= bitwiseOrZero(t2);
 
     double y = -2 * pulseWidth;
-    if (t < pulseWidth) {
+    if (t0 < pulseWidth) {
         y += 2;
     }
 
-    y += blep(t, freqInSecondsPerSample) - blep(t2, freqInSecondsPerSample);
+    y += blep(t0, freqInSecondsPerSample) - blep(t2, freqInSecondsPerSample);
 
     return amplitude * y;
 }
