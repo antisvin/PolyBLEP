@@ -160,13 +160,14 @@ double PolyBLEP::sin() const {
 
 
 double PolyBLEP::half() const {
-    double t2 = t + 0.5;
+    double t0 = t / 2.0;
+    double t2 = t0 + 0.5;
     t2 -= bitwiseOrZero(t2);
+    
+    double y = 2 * std::sin(TWO_PI * t0) - 1;
+    y += TWO_PI * freqInSecondsPerSample * (blamp(t0, freqInSecondsPerSample) + blamp(t2, freqInSecondsPerSample));
 
-    double y = (t < 0.5 ? 2 * std::sin(TWO_PI * t) - 2 / M_PI : -2 / M_PI);
-    y += TWO_PI * freqInSecondsPerSample * (blamp(t, freqInSecondsPerSample) + blamp(t2, freqInSecondsPerSample));
-
-    return amplitude * y * 2.0;
+    return amplitude * y;
 }
 
 double PolyBLEP::tri() const {
