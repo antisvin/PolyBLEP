@@ -172,14 +172,16 @@ double PolyBLEP::half() const {
 
 double PolyBLEP::tri() const {
     double pulseWidth = std::fmax(0.0001, std::fmin(0.9999, this->pulseWidth));
+    
+    double t0 = t - pulseWidth / 2.0;
 
-    double t1 = t + 0.5 * pulseWidth;
+    double t1 = t0 + 0.5 * pulseWidth;
     t1 -= bitwiseOrZero(t1);
 
-    double t2 = t + 1 - 0.5 * pulseWidth;
+    double t2 = t0 + 1 - 0.5 * pulseWidth;
     t2 -= bitwiseOrZero(t2);
 
-    double y = t * 2;
+    double y = t0 * 2;
 
     if (y >= 2 - pulseWidth) {
         y = (y - 2) / pulseWidth;
